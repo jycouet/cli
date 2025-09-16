@@ -51,20 +51,20 @@ export function setupTest<Addons extends AddonMap>(
 		create = createProject({ cwd, templatesDir, testName });
 
 		// creates a pnpm workspace in each addon dir
-		fs.writeFileSync(
-			path.resolve(cwd, testName, 'pnpm-workspace.yaml'),
-			"packages:\n  - '**/*'",
-			'utf8'
-		);
+		// fs.writeFileSync(
+		// 	path.resolve(cwd, testName, 'pnpm-workspace.yaml'),
+		// 	"packages:\n  - '**/*'",
+		// 	'utf8'
+		// );
 
-		// creates a barebones package.json in each addon dir
-		fs.writeFileSync(
-			path.resolve(cwd, testName, 'package.json'),
-			JSON.stringify({
-				name: `${testName}-workspace-root`,
-				private: true
-			})
-		);
+		// // creates a barebones package.json in each addon dir
+		// fs.writeFileSync(
+		// 	path.resolve(cwd, testName, 'package.json'),
+		// 	JSON.stringify({
+		// 		name: `${testName}-workspace-root`,
+		// 		private: true
+		// 	})
+		// );
 	});
 
 	// runs before each test case
@@ -76,6 +76,7 @@ export function setupTest<Addons extends AddonMap>(
 		}
 		ctx.run = async (variant, options) => {
 			const cwd = create({ testId: ctx.task.id, variant });
+			fs.writeFileSync(path.resolve(cwd, 'pnpm-workspace.yaml'), "packages:\n  - '*'", 'utf8');
 
 			// test metadata
 			const metaPath = path.resolve(cwd, 'meta.json');
