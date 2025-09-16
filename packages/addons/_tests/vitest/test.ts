@@ -7,7 +7,7 @@ const { test, variants } = setupTest({ vitest }, { browser: false });
 test.sequential.for(variants)('core - %s', async (variant, { expect, ...ctx }) => {
 	const cwd = await ctx.run(variant, { vitest: {} });
 
-	expect(() => execSync('pnpm install', { cwd, stdio: 'pipe' })).not.toThrow();
+	expect(() => execSync('pnpm install --no-frozen-lockfile', { cwd, stdio: 'pipe' })).not.toThrow();
 
 	expect(() => execSync('pnpm exec playwright install chromium', { cwd })).not.toThrow();
 

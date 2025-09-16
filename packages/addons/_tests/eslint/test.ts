@@ -12,7 +12,7 @@ test.sequential.for(variants)('core - %s', async (variant, { expect, ...ctx }) =
 	const unlintedFile = 'let foo = "";\nif (Boolean(foo)) {\n//\n}';
 	fs.writeFileSync(path.resolve(cwd, 'src/lib/foo.js'), unlintedFile, 'utf8');
 
-	expect(() => execSync('pnpm install', { cwd, stdio: 'pipe' })).not.toThrow();
+	expect(() => execSync('pnpm install --no-frozen-lockfile', { cwd, stdio: 'pipe' })).not.toThrow();
 
 	expect(() => execSync('pnpm lint', { cwd, stdio: 'pipe' })).toThrow();
 
