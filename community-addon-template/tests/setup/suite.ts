@@ -78,7 +78,7 @@ export function setupTest<Addons extends AddonMap>(addons: Addons) {
 				options,
 				packageManager: 'pnpm'
 			});
-			addPnpmBuildDependencies(cwd, 'pnpm', ['esbuild', ...pnpmBuildDependencies]);
+			await addPnpmBuildDependencies(cwd, 'pnpm', ['esbuild', ...pnpmBuildDependencies]);
 
 			return cwd;
 		};
@@ -106,7 +106,7 @@ async function prepareServer({ cwd, page }: { cwd: string; page: Page }) {
 	// ...do commands and any other extra stuff
 
 	// build project
-	execSync('npm run build', { cwd, stdio: 'pipe' });
+	execSync('pnpm build', { cwd, stdio: 'pipe' });
 
 	// start preview server `vite preview`
 	const { url, close } = await startPreview({ cwd });

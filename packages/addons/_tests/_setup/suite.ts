@@ -88,7 +88,7 @@ export function setupTest<Addons extends AddonMap>(
 				options,
 				packageManager: 'pnpm'
 			});
-			addPnpmBuildDependencies(cwd, 'pnpm', ['esbuild', ...pnpmBuildDependencies]);
+			await addPnpmBuildDependencies(cwd, 'pnpm', ['esbuild', ...pnpmBuildDependencies]);
 
 			return cwd;
 		};
@@ -116,9 +116,9 @@ async function prepareServer(
 	{
 		cwd,
 		page,
-		previewCommand = 'npm run preview',
-		buildCommand = 'npm run build',
-		installCommand = 'pnpm install --no-frozen-lockfile'
+		installCommand = 'pnpm install --no-frozen-lockfile',
+		buildCommand = 'pnpm build',
+		previewCommand = 'pnpm preview'
 	}: PrepareServerOptions,
 	afterInstall?: () => Promise<any> | any
 ) {
