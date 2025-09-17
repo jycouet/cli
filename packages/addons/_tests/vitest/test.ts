@@ -4,7 +4,7 @@ import vitest from '../../vitest-addon/index.ts';
 
 const { test, variants } = setupTest({ vitest }, { browser: false });
 
-test.sequential.for(variants)('core - %s', async (variant, { expect, ...ctx }) => {
+test.concurrent.for(variants)('core - %s', async (variant, { expect, ...ctx }) => {
 	const cwd = await ctx.run(variant, { vitest: {} });
 
 	expect(() => execSync('pnpm install --no-frozen-lockfile', { cwd, stdio: 'pipe' })).not.toThrow();
