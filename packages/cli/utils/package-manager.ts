@@ -95,6 +95,8 @@ export async function addPnpmBuildDependencies(
 
 	let confIn: 'package.json' | 'pnpm-workspace.yaml' = 'package.json';
 	const pnpmVersion = await getPnpmVersion();
+	console.log(`pnpmVersion`, pnpmVersion);
+
 	if (pnpmVersion) {
 		confIn = isVersionUnsupportedBelow(pnpmVersion, '10.5')
 			? 'package.json'
@@ -104,6 +106,7 @@ export async function addPnpmBuildDependencies(
 	// find the workspace root (if present)
 	const found = find.up('pnpm-workspace.yaml', { cwd });
 	const dir = found ? path.dirname(found) : cwd;
+	console.log(`confIn`, confIn);
 
 	if (confIn === 'package.json') {
 		// load the package.json
