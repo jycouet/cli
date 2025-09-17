@@ -123,36 +123,16 @@ export async function startPreview({
 
 async function terminate(pid: number) {
 	try {
-		// On Windows, use taskkill to terminate the process tree
 		if (process.platform === 'win32') {
-			const { exec: execAsync } = await import('node:child_process');
-			const { promisify } = await import('node:util');
-			const execPromise = promisify(execAsync);
-
-			try {
-				// Use taskkill to terminate the process tree (/T flag) forcefully (/F flag)
-				await execPromise(`taskkill /pid ${pid} /T /F`);
-			} catch {
-				// Fallback: try to kill just the main process
-				try {
-					process.kill(pid, 'SIGTERM');
-				} catch {
-					// Process might already be terminated
-				}
-			}
+			await exec(`taskkill /pid ${pid} /T /F`); // on windows, use taskkill to terminate the process tree
 		} else {
-			// On Unix-like systems, use process.kill
-			try {
-				process.kill(-pid, 'SIGTERM'); // Kill the process group
-			} catch {
-				try {
-					process.kill(pid, 'SIGTERM'); // Kill just the process
-				} catch {
-					// Process might already be terminated
-				}
-			}
+			process.kill(-pid, 'SIGTERM'); // Kill the process group
 		}
 	} catch {
-		// Ignore all errors - the process might have already terminated
+		try {
+			process.kill(pid, 'SIGTERM'); // Kill just the process
+		} catch {
+			// Process might already be terminated
+		}
 	}
 }
