@@ -28,8 +28,8 @@ type SetupOptions = {
 	/** @default false */
 	clean?: boolean;
 };
-/** @deprecated Internal helper used by `createSetupTest` - will be removed from public API in a future version. */
-export function setup({ cwd, clean = false, variants }: SetupOptions): { templatesDir: string } {
+
+function setup({ cwd, clean = false, variants }: SetupOptions): { templatesDir: string } {
 	const workingDir = path.resolve(cwd);
 	if (clean && fs.existsSync(workingDir)) {
 		fs.rmSync(workingDir, { force: true, recursive: true });
@@ -59,8 +59,8 @@ export function setup({ cwd, clean = false, variants }: SetupOptions): { templat
 }
 
 type CreateOptions = { cwd: string; testName: string; templatesDir: string };
-/** @deprecated Internal helper used by `createSetupTest` - will be removed from public API in a future version. */
-export function createProject({ cwd, testName, templatesDir }: CreateOptions): CreateProject {
+
+function createProject({ cwd, testName, templatesDir }: CreateOptions): CreateProject {
 	// create the reference dir
 	const testDir = path.resolve(cwd, testName);
 	fs.mkdirSync(testDir, { recursive: true });
@@ -76,8 +76,8 @@ export function createProject({ cwd, testName, templatesDir }: CreateOptions): C
 }
 
 type PreviewOptions = { cwd: string; command?: string };
-/** @deprecated Internal helper used by `prepareServer` - will be removed from public API in a future version. */
-export async function startPreview({
+
+async function startPreview({
 	cwd,
 	command = 'npm run preview'
 }: PreviewOptions): Promise<{ url: string; close: () => Promise<void> }> {
@@ -241,12 +241,17 @@ export async function prepareServer({
 	return { url, close };
 }
 
+export type PlaywrightContext = Pick<typeof import('@playwright/test'), 'chromium'>;
+
 export type VitestContext = Pick<
 	typeof import('vitest'),
 	'inject' | 'test' | 'beforeAll' | 'beforeEach'
 >;
 
-export function createSetupTest(vitest: VitestContext): <Addons extends AddonMap>(
+export function createSetupTest(
+	vitest: VitestContext,
+	playwright?: PlaywrightContext
+): <Addons extends AddonMap>(
 	addons: Addons,
 	options?: SetupTestOptions<Addons>
 ) => {
@@ -274,12 +279,16 @@ export function createSetupTest(vitest: VitestContext): <Addons extends AddonMap
 		if (withBrowser) {
 			beforeAll(async () => {
 				let chromium: Awaited<typeof import('@playwright/test')>['chromium'];
-				try {
-					({ chromium } = await import('@playwright/test'));
-				} catch {
-					throw new Error(
-						'Browser testing requires @playwright/test. Install it with: pnpm add -D @playwright/test'
-					);
+				if (playwright) {
+					chromium = playwright.chromium;
+				} else {
+					try {
+						({ chromium } = await import('@playwright/test'));
+					} catch {
+						throw new Error(
+							'Browser testing requires @playwright/test. Install it with: pnpm add -D @playwright/test'
+						);
+					}
 				}
 				browser = await chromium.launch();
 				return async () => {

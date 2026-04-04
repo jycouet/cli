@@ -1,5 +1,5 @@
 import * as p from '@clack/prompts';
-import { color, commonFilePaths, loadPackageJson, resolveCommandArray } from '@sveltejs/sv-utils';
+import { color, loadPackageJson, resolveCommandArray } from '@sveltejs/sv-utils';
 import { Command, Option } from 'commander';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -258,14 +258,25 @@ async function createProject(cwd: ProjectPath, options: Options) {
 	const projectPath = path.resolve(directory);
 	const basename = path.basename(projectPath);
 	const parentDirName = path.basename(path.dirname(projectPath));
-	const projectName = parentDirName.startsWith('@') ? `${parentDirName}/${basename}` : basename;
+	let projectName = parentDirName.startsWith('@') ? `${parentDirName}/${basename}` : basename;
 
 	if (template === 'addon' && !projectName.startsWith('@')) {
 		// At this stage, we don't support un-scoped add-ons
 		// FYI: a demo exists for `npx sv add my-cool-addon`
-		common.errorAndExit(
-			`Community add-ons must be published under an npm org (e.g. ${color.command('@my-org/sv')}). Unscoped package names are not supported at this stage.`
-		);
+		const org = await p.text({
+			message: `Community add-ons must be published under an npm org. Enter the name of your npm org:`,
+			placeholder: '  @my-org',
+			validate: (value) => {
+				if (!value) return 'Organization name is required';
+				if (!value.startsWith('@')) return 'Must start with @';
+				if (value.includes('/')) return 'Just the org, not the full package name';
+			}
+		});
+		if (p.isCancel(org)) {
+			p.cancel('Operation cancelled.');
+			process.exit(0);
+		}
+		projectName = `${org}/${basename}`;
 	}
 
 	if (template === 'addon' && options.add.length > 0) {
@@ -468,8 +479,11 @@ export async function createVirtualWorkspace({
 		language: type === 'typescript' ? 'ts' : 'js',
 		file: {
 			...tentativeWorkspace.file,
-			viteConfig: type === 'typescript' ? commonFilePaths.viteConfigTS : commonFilePaths.viteConfig,
-			svelteConfig: commonFilePaths.svelteConfig // currently we always use js files, never typescript files
+			viteConfig:
+				type === 'typescript'
+					? common.commonFilePaths.viteConfigTS
+					: common.commonFilePaths.viteConfig,
+			svelteConfig: common.commonFilePaths.svelteConfig // currently we always use js files, never typescript files
 		}
 	};
 

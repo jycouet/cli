@@ -1,6 +1,7 @@
-import { sanitizeName, commonFilePaths } from '@sveltejs/sv-utils';
+import { sanitizeName } from '@sveltejs/sv-utils';
 import fs from 'node:fs';
 import path from 'node:path';
+import { commonFilePaths } from '../core/common.ts';
 import { mkdirp, copy, dist, getSharedFiles, replace, kv } from './utils.ts';
 
 export type TemplateType = (typeof templateTypes)[number];
@@ -33,19 +34,7 @@ export type Common = {
 	}>;
 };
 
-export function create(cwd: string, options: Omit<Options, 'cwd'>): void;
-export function create(options: Options): void;
-export function create(cwdOrOptions: string | Options, legacyOptions?: Omit<Options, 'cwd'>): void {
-	let cwd: string;
-	let options: Omit<Options, 'cwd'>;
-	if (typeof cwdOrOptions === 'string') {
-		cwd = cwdOrOptions;
-		options = legacyOptions!;
-	} else {
-		cwd = cwdOrOptions.cwd;
-		options = cwdOrOptions;
-	}
-
+export function create({ cwd, ...options }: Options): void {
 	mkdirp(cwd);
 
 	write_template_files(options.template, options.types, options.name, cwd);
