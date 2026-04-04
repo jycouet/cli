@@ -5,7 +5,13 @@
 ```ts
 type TemplateType = (typeof templateTypes)[number];
 type LanguageType = (typeof languageTypes)[number];
-declare const templateTypes: readonly ["minimal", "demo", "library", "addon", "svelte"];
+declare const templateTypes: readonly [
+  "minimal",
+  "demo",
+  "library",
+  "addon",
+  "svelte",
+];
 declare const languageTypes: readonly ["typescript", "checkjs", "none"];
 type Options = {
   cwd: string;
@@ -23,5 +29,41 @@ type FileType = {
   condition?: ConditionDefinition;
   content: (editor: FileEditor) => string;
 };
-export { type Addon, type AddonDefinition, type AddonInput, type AddonMap, type AddonReference, type AddonResult, type AddonSource, type BaseQuestion, type BooleanQuestion, type ConfiguredAddon, type FileEditor, type FileType, type InstallOptions, type LanguageType, type LoadedAddon, type MultiSelectQuestion, type NumberQuestion, type OptionBuilder, type OptionDefinition, type OptionMap, type OptionValues, type PreparedAddon, type Question, type SelectQuestion, type SetupResult, type StringQuestion, type SvApi, type TemplateType, type Workspace, type WorkspaceOptions, add, create, defineAddon, defineAddonOptions, officialAddons };
+export {
+  type Addon,
+  type AddonDefinition,
+  type AddonInput,
+  type AddonMap,
+  type AddonReference,
+  type AddonResult,
+  type AddonSource,
+  type BaseQuestion,
+  type BooleanQuestion,
+  type ConfiguredAddon,
+  type FileEditor,
+  type FileType,
+  type InstallOptions,
+  type LanguageType,
+  type LoadedAddon,
+  type MultiSelectQuestion,
+  type NumberQuestion,
+  type OptionBuilder,
+  type OptionDefinition,
+  type OptionMap,
+  type OptionValues,
+  type PreparedAddon,
+  type Question,
+  type SelectQuestion,
+  type SetupResult,
+  type StringQuestion,
+  type SvApi,
+  type TemplateType,
+  type Workspace,
+  type WorkspaceOptions,
+  add,
+  create,
+  defineAddon,
+  defineAddonOptions,
+  officialAddons,
+};
 ```
