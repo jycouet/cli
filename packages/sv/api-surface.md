@@ -8,11 +8,13 @@ type LanguageType = (typeof languageTypes)[number];
 declare const templateTypes: readonly ['minimal', 'demo', 'library', 'addon', 'svelte'];
 declare const languageTypes: readonly ['typescript', 'checkjs', 'none'];
 type Options = {
+	cwd: string;
 	name: string;
 	template: TemplateType;
 	types: LanguageType;
 };
-declare function create(cwd: string, options: Options): void;
+declare function create(cwd: string, options: Omit<Options, 'cwd'>): void;
+declare function create(options: Options): void;
 type FileEditor = Workspace & {
 	content: string;
 };
@@ -22,48 +24,40 @@ type FileType = {
 	content: (editor: FileEditor) => string;
 };
 export {
-	Addon,
-	AddonDefinition,
-	AddonInput,
+	type Addon,
+	type AddonDefinition,
+	type AddonInput,
 	type AddonMap,
-	AddonReference,
-	AddonResult,
-	AddonSource,
-	BaseQuestion,
-	BooleanQuestion,
-	ConditionDefinition,
-	ConfiguredAddon,
-	FileEditor,
-	FileType,
+	type AddonReference,
+	type AddonResult,
+	type AddonSource,
+	type BaseQuestion,
+	type BooleanQuestion,
+	type ConfiguredAddon,
+	type FileEditor,
+	type FileType,
 	type InstallOptions,
 	type LanguageType,
-	LoadedAddon,
-	MultiSelectQuestion,
-	NumberQuestion,
-	OptionBuilder,
-	OptionDefinition,
+	type LoadedAddon,
+	type MultiSelectQuestion,
+	type NumberQuestion,
+	type OptionBuilder,
+	type OptionDefinition,
 	type OptionMap,
-	OptionValues,
-	PackageDefinition,
-	PreparedAddon,
-	Question,
-	Scripts,
-	SelectQuestion,
-	SetupResult,
-	StringQuestion,
-	SvApi,
+	type OptionValues,
+	type PreparedAddon,
+	type Question,
+	type SelectQuestion,
+	type SetupResult,
+	type StringQuestion,
+	type SvApi,
 	type TemplateType,
-	TestDefinition,
-	Tests,
-	Verification,
-	Workspace,
-	WorkspaceOptions,
+	type Workspace,
+	type WorkspaceOptions,
 	add,
 	create,
-	createWorkspace,
 	defineAddon,
 	defineAddonOptions,
-	getErrorHint,
 	officialAddons
 };
 ```

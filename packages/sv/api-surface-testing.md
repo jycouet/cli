@@ -15,6 +15,7 @@ type SetupOptions = {
 	variants: readonly ProjectVariant[];
 	clean?: boolean;
 };
+/** @deprecated Internal helper used by `createSetupTest` - will be removed from public API in a future version. */
 declare function setup({ cwd, clean, variants }: SetupOptions): {
 	templatesDir: string;
 };
@@ -23,11 +24,13 @@ type CreateOptions = {
 	testName: string;
 	templatesDir: string;
 };
+/** @deprecated Internal helper used by `createSetupTest` - will be removed from public API in a future version. */
 declare function createProject({ cwd, testName, templatesDir }: CreateOptions): CreateProject;
 type PreviewOptions = {
 	cwd: string;
 	command?: string;
 };
+/** @deprecated Internal helper used by `prepareServer` - will be removed from public API in a future version. */
 declare function startPreview({ cwd, command }: PreviewOptions): Promise<{
 	url: string;
 	close: () => Promise<void>;
