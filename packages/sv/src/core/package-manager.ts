@@ -3,9 +3,9 @@ import {
 	AGENTS,
 	type AgentName,
 	COMMANDS,
-	color,
 	constructCommand,
 	detect,
+	color,
 	isVersionUnsupportedBelow,
 	parse
 } from '@sveltejs/sv-utils';
@@ -116,7 +116,9 @@ export async function addPnpmBuildDependencies(
 		const content = found ? fs.readFileSync(found, 'utf-8') : '';
 		const { data, generateCode } = parse.yaml(content);
 
-		const onlyBuiltDependencies = data.get('onlyBuiltDependencies');
+		const onlyBuiltDependencies = data.get('onlyBuiltDependencies') as
+			| { items?: Array<{ value: string } | string> }
+			| undefined;
 		const items: Array<{ value: string } | string> = onlyBuiltDependencies?.items ?? [];
 
 		for (const item of allowedPackages) {
