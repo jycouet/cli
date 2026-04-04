@@ -1257,22 +1257,6 @@ type Package = {
   keywords?: string[];
   workspaces?: string[];
 };
-declare function getPackageJson(cwd: string): {
-  source: string;
-  data: Package;
-  generateCode: () => string;
-};
-declare function readFile(cwd: string, filePath: string): string;
-declare function fileExists(cwd: string, filePath: string): boolean;
-declare function writeFile(cwd: string, filePath: string, content: string): void;
-/**
-* @deprecated Internal to sv — merged into `package.json` by the add-on runner only. Will be removed from the public API in a future version.
-*/
-declare function installPackages(dependencies: Array<{
-  pkg: string;
-  version: string;
-  dev: boolean;
-}>, cwd: string): string;
 declare const commonFilePaths: {
   readonly packageJson: "package.json";
   readonly svelteConfig: "svelte.config.js";
@@ -1282,6 +1266,22 @@ declare const commonFilePaths: {
   readonly viteConfig: "vite.config.js";
   readonly viteConfigTS: "vite.config.ts";
 };
+declare function fileExists(cwd: string, filePath: string): boolean;
+
+declare function loadFile(cwd: string, filePath: string): string;
+
+declare function saveFile(cwd: string, filePath: string, content: string): void;
+declare function loadPackageJson(cwd: string): {
+  source: string;
+  data: Package;
+  generateCode: () => string;
+};
+/** @deprecated Use `loadFile` instead. */
+declare const readFile: typeof loadFile;
+/** @deprecated Use `saveFile` instead. */
+declare const writeFile: typeof saveFile;
+/** @deprecated Use `loadPackageJson` instead. */
+declare const getPackageJson: typeof loadPackageJson;
 type ColorInput = string | string[];
 declare const color: {
   addon: (str: ColorInput) => string;
@@ -1309,5 +1309,5 @@ declare const parse: {
   toml: typeof parseToml;
   yaml: typeof parseYaml;
 };
-export { AGENTS, type AgentName, type estree as AstTypes, COMMANDS, type Comments, type Package, type SvelteAst, type TransformFn, index_d_exports as Walker, color, commonFilePaths, constructCommand, createPrinter, index_d_exports$1 as css, dedent, detect, downloadJson, fileExists, getPackageJson, index_d_exports$2 as html, installPackages, isVersionUnsupportedBelow, index_d_exports$3 as js, json_d_exports as json, parse, readFile, resolveCommand, resolveCommandArray, sanitizeName, splitVersion, index_d_exports$4 as svelte, text_d_exports as text, transforms, writeFile };
+export { AGENTS, type AgentName, type estree as AstTypes, COMMANDS, type Comments, type Package, type SvelteAst, type TransformFn, index_d_exports as Walker, color, commonFilePaths, constructCommand, createPrinter, index_d_exports$1 as css, dedent, detect, downloadJson, fileExists, getPackageJson, index_d_exports$2 as html, isVersionUnsupportedBelow, index_d_exports$3 as js, json_d_exports as json, loadFile, loadPackageJson, parse, readFile, resolveCommand, resolveCommandArray, sanitizeName, saveFile, splitVersion, index_d_exports$4 as svelte, text_d_exports as text, transforms, writeFile };
 ```

@@ -106,7 +106,7 @@ export default defineAddon({
 		}
 
 		sv.file(
-			file.vscodeSettings,
+			'.vscode/settings.json',
 			transforms.json(({ data }) => {
 				data['files.associations'] ??= {};
 				data['files.associations']['*.css'] = 'tailwindcss';
@@ -114,7 +114,7 @@ export default defineAddon({
 		);
 
 		sv.file(
-			file.vscodeExtensions,
+			'.vscode/extensions.json',
 			transforms.json(({ data, json }) => {
 				json.arrayUpsert(data, 'recommendations', 'bradlc.vscode-tailwindcss');
 			})
@@ -122,7 +122,7 @@ export default defineAddon({
 
 		if (prettierInstalled) {
 			sv.file(
-				file.prettierrc,
+				'.prettierrc',
 				transforms.json(({ data, json }) => {
 					json.arrayUpsert(data, 'plugins', 'prettier-plugin-tailwindcss');
 					data.tailwindStylesheet ??= file.getRelative({ to: file.stylesheet });
