@@ -1276,11 +1276,17 @@ declare function loadPackageJson(cwd: string): {
   data: Package;
   generateCode: () => string;
 };
-/** @deprecated Use `loadFile` instead. */
+/**
+* @deprecated Use {@link loadFile} instead. This alias will be removed in a future version.
+*/
 declare const readFile: typeof loadFile;
-/** @deprecated Use `saveFile` instead. */
+/**
+* @deprecated Use {@link saveFile} instead. This alias will be removed in a future version.
+*/
 declare const writeFile: typeof saveFile;
-/** @deprecated Use `loadPackageJson` instead. */
+/**
+* @deprecated Use {@link loadPackageJson} instead. This alias will be removed in a future version.
+*/
 declare const getPackageJson: typeof loadPackageJson;
 type ColorInput = string | string[];
 declare const color: {
