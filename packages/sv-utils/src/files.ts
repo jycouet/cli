@@ -69,18 +69,3 @@ export function loadPackageJson(cwd: string): {
 	const { data, generateCode } = parseJson(packageText);
 	return { source: packageText, data: data as Package, generateCode };
 }
-
-/**
- * @deprecated Use {@link loadFile} instead. This alias will be removed in a future version.
- */
-export const readFile: typeof loadFile = loadFile;
-
-/**
- * @deprecated Use {@link saveFile} instead. This alias will be removed in a future version.
- */
-export const writeFile: typeof saveFile = saveFile;
-
-/**
- * @deprecated Use {@link loadPackageJson} instead. This alias will be removed in a future version.
- */
-export const getPackageJson: typeof loadPackageJson = loadPackageJson;

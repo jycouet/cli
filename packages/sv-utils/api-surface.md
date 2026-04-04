@@ -812,18 +812,6 @@ declare function loadPackageJson(cwd: string): {
   data: Package;
   generateCode: () => string;
 };
-/**
- * @deprecated Use {@link loadFile} instead. This alias will be removed in a future version.
- */
-declare const readFile: typeof loadFile;
-/**
- * @deprecated Use {@link saveFile} instead. This alias will be removed in a future version.
- */
-declare const writeFile: typeof saveFile;
-/**
- * @deprecated Use {@link loadPackageJson} instead. This alias will be removed in a future version.
- */
-declare const getPackageJson: typeof loadPackageJson;
 type ColorInput = string | string[];
 declare const color: {
   addon: (str: ColorInput) => string;
@@ -869,7 +857,6 @@ export {
   detect,
   downloadJson,
   fileExists,
-  getPackageJson,
   index_d_exports$2 as html,
   isVersionUnsupportedBelow,
   index_d_exports$3 as js,
@@ -877,7 +864,6 @@ export {
   loadFile,
   loadPackageJson,
   parse,
-  readFile,
   resolveCommand,
   resolveCommandArray,
   sanitizeName,
@@ -886,6 +872,5 @@ export {
   index_d_exports$4 as svelte,
   text_d_exports as text,
   transforms,
-  writeFile,
 };
 ```
