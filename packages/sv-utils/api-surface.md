@@ -1265,6 +1265,9 @@ declare function getPackageJson(cwd: string): {
 declare function readFile(cwd: string, filePath: string): string;
 declare function fileExists(cwd: string, filePath: string): boolean;
 declare function writeFile(cwd: string, filePath: string, content: string): void;
+/**
+* @deprecated Internal to sv — merged into `package.json` by the add-on runner only. Will be removed from the public API in a future version.
+*/
 declare function installPackages(dependencies: Array<{
   pkg: string;
   version: string;

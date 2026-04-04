@@ -10,6 +10,7 @@ import { add, type AddonMap, type OptionMap } from './core/engine.ts';
 import { addPnpmBuildDependencies } from './core/package-manager.ts';
 import { create } from './create/index.ts';
 
+/** @deprecated Internal helper - will be removed from public API in a future version. */
 export { addPnpmBuildDependencies } from './core/package-manager.ts';
 export type ProjectVariant = 'kit-js' | 'kit-ts' | 'vite-js' | 'vite-ts';
 export const variants: ProjectVariant[] = ['kit-js', 'kit-ts', 'vite-js', 'vite-ts'];
@@ -29,6 +30,7 @@ type SetupOptions = {
 	/** @default false */
 	clean?: boolean;
 };
+/** @deprecated Internal helper used by `createSetupTest` - will be removed from public API in a future version. */
 export function setup({ cwd, clean = false, variants }: SetupOptions): { templatesDir: string } {
 	const workingDir = path.resolve(cwd);
 	if (clean && fs.existsSync(workingDir)) {
@@ -43,13 +45,13 @@ export function setup({ cwd, clean = false, variants }: SetupOptions): { templat
 		if (fs.existsSync(templatePath)) continue;
 
 		if (variant === 'kit-js') {
-			create(templatePath, { name: variant, template: 'minimal', types: 'checkjs' });
+			create({ cwd: templatePath, name: variant, template: 'minimal', types: 'checkjs' });
 		} else if (variant === 'kit-ts') {
-			create(templatePath, { name: variant, template: 'minimal', types: 'typescript' });
+			create({ cwd: templatePath, name: variant, template: 'minimal', types: 'typescript' });
 		} else if (variant === 'vite-js') {
-			create(templatePath, { name: variant, template: 'svelte', types: 'none' });
+			create({ cwd: templatePath, name: variant, template: 'svelte', types: 'none' });
 		} else if (variant === 'vite-ts') {
-			create(templatePath, { name: variant, template: 'svelte', types: 'typescript' });
+			create({ cwd: templatePath, name: variant, template: 'svelte', types: 'typescript' });
 		} else {
 			throw new Error(`Unknown project variant: ${variant}`);
 		}
@@ -59,6 +61,7 @@ export function setup({ cwd, clean = false, variants }: SetupOptions): { templat
 }
 
 type CreateOptions = { cwd: string; testName: string; templatesDir: string };
+/** @deprecated Internal helper used by `createSetupTest` - will be removed from public API in a future version. */
 export function createProject({ cwd, testName, templatesDir }: CreateOptions): CreateProject {
 	// create the reference dir
 	const testDir = path.resolve(cwd, testName);
@@ -75,6 +78,7 @@ export function createProject({ cwd, testName, templatesDir }: CreateOptions): C
 }
 
 type PreviewOptions = { cwd: string; command?: string };
+/** @deprecated Internal helper used by `prepareServer` - will be removed from public API in a future version. */
 export async function startPreview({
 	cwd,
 	command = 'npm run preview'

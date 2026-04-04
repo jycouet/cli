@@ -324,7 +324,8 @@ async function createProject(cwd: ProjectPath, options: Options) {
 		answers = result.answers;
 	}
 
-	createKit(projectPath, {
+	createKit({
+		cwd: projectPath,
 		name: projectName,
 		template,
 		types: language
