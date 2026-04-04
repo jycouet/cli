@@ -1,15 +1,16 @@
 import * as p from '@clack/prompts';
 import {
 	color,
-	resolveCommand,
-	type AgentName,
 	fileExists,
-	installPackages,
-	readFile,
-	writeFile
+	loadFile,
+	loadPackageJson,
+	saveFile,
+	resolveCommand,
+	type AgentName
 } from '@sveltejs/sv-utils';
 import { NonZeroExitError, exec } from 'tinyexec';
 import { createLoadedAddon } from '../cli/add.ts';
+import { commonFilePaths } from './common.ts';
 import {
 	getErrorHint,
 	type Addon,
@@ -21,6 +22,38 @@ import {
 } from './config.ts';
 import { TESTING } from './env.ts';
 import { createWorkspace, type Workspace } from './workspace.ts';
+
+function alphabetizePackageJsonDependencies(obj: Record<string, string>) {
+	const ordered: Record<string, string> = {};
+	for (const [key, value] of Object.entries(obj).sort(([a], [b]) => a.localeCompare(b))) {
+		ordered[key] = value;
+	}
+	return ordered;
+}
+
+function updatePackages(
+	dependencies: Array<{ pkg: string; version: string; dev: boolean }>,
+	cwd: string
+): string {
+	const { data, generateCode } = loadPackageJson(cwd);
+
+	for (const dependency of dependencies) {
+		if (dependency.dev) {
+			data.devDependencies ??= {};
+			data.devDependencies[dependency.pkg] = dependency.version;
+		} else {
+			data.dependencies ??= {};
+			data.dependencies[dependency.pkg] = dependency.version;
+		}
+	}
+
+	if (data.dependencies) data.dependencies = alphabetizePackageJsonDependencies(data.dependencies);
+	if (data.devDependencies)
+		data.devDependencies = alphabetizePackageJsonDependencies(data.devDependencies);
+
+	saveFile(cwd, commonFilePaths.packageJson, generateCode());
+	return commonFilePaths.packageJson;
+}
 
 export type InstallOptions<Addons extends AddonMap> = {
 	cwd: string;
@@ -71,11 +104,9 @@ export async function applyAddons({
 	options
 }: ApplyAddonOptions): Promise<{
 	filesToFormat: string[];
-	pnpmBuildDependencies: string[];
 	status: Record<string, string[] | 'success'>;
 }> {
 	const filesToFormat = new Set<string>();
-	const allPnpmBuildDependencies: string[] = [];
 	const status: Record<string, string[] | 'success'> = {};
 
 	const addonDefs = loadedAddons.map((l) => l.addon);
@@ -95,7 +126,7 @@ export async function applyAddons({
 		// If we don't have a formatter yet, check if the addon adds one
 		if (!hasFormatter) hasFormatter = !!addonWorkspace.dependencyVersion('prettier');
 
-		const { files, pnpmBuildDependencies, cancels } = await runAddon({
+		const { files, cancels } = await runAddon({
 			workspace: addonWorkspace,
 			workspaceOptions,
 			addon,
@@ -104,7 +135,6 @@ export async function applyAddons({
 		});
 
 		files.forEach((f) => filesToFormat.add(f));
-		pnpmBuildDependencies.forEach((s) => allPnpmBuildDependencies.push(s));
 		if (cancels.length === 0) {
 			status[addon.id] = 'success';
 		} else {
@@ -114,7 +144,6 @@ export async function applyAddons({
 
 	return {
 		filesToFormat: hasFormatter ? Array.from(filesToFormat) : [],
-		pnpmBuildDependencies: allPnpmBuildDependencies,
 		status
 	};
 }
@@ -176,15 +205,14 @@ async function runAddon({ addon, loaded, multiple, workspace, workspaceOptions }
 	}
 
 	const dependencies: Array<{ pkg: string; version: string; dev: boolean }> = [];
-	const pnpmBuildDependencies: string[] = [];
 	const sv: SvApi = {
 		file: (path, edit) => {
 			try {
-				const content = fileExists(workspace.cwd, path) ? readFile(workspace.cwd, path) : '';
+				const content = fileExists(workspace.cwd, path) ? loadFile(workspace.cwd, path) : '';
 				const editedContent = edit(content);
 				if (editedContent === '' || editedContent === false) return content;
 
-				writeFile(workspace.cwd, path, editedContent);
+				saveFile(workspace.cwd, path, editedContent);
 				files.add(path);
 			} catch (e) {
 				if (e instanceof Error) {
@@ -225,9 +253,6 @@ async function runAddon({ addon, loaded, multiple, workspace, workspaceOptions }
 		},
 		devDependency: (pkg, version) => {
 			dependencies.push({ pkg, version, dev: true });
-		},
-		pnpmBuildDependency: (pkg) => {
-			pnpmBuildDependencies.push(pkg);
 		}
 	};
 
@@ -250,13 +275,12 @@ async function runAddon({ addon, loaded, multiple, workspace, workspaceOptions }
 	}
 
 	if (cancels.length === 0) {
-		const pkgPath = installPackages(dependencies, workspace.cwd);
+		const pkgPath = updatePackages(dependencies, workspace.cwd);
 		files.add(pkgPath);
 	}
 
 	return {
 		files: Array.from(files),
-		pnpmBuildDependencies,
 		cancels
 	};
 }

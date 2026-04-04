@@ -103,8 +103,15 @@ export default defineConfig([
 		},
 		failOnWarn: true,
 		deps: {
-			neverBundle: [/^svelte/, '@types/estree', 'estree'],
-			onlyBundle: ['dedent', 'package-manager-detector', 'smol-toml', 'yaml', 'zimmerframe']
+			neverBundle: [
+				/^svelte/,
+				'@types/estree',
+				'estree',
+				'yaml',
+				'dedent',
+				'package-manager-detector'
+			],
+			onlyBundle: ['smol-toml', 'zimmerframe']
 		}
 	}
 ]);

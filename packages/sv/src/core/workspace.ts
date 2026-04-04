@@ -3,13 +3,13 @@ import {
 	type AstTypes,
 	js,
 	parse,
-	commonFilePaths,
-	getPackageJson,
-	readFile
+	loadFile,
+	loadPackageJson
 } from '@sveltejs/sv-utils';
 import * as find from 'empathic/find';
 import fs from 'node:fs';
 import path from 'node:path';
+import { commonFilePaths } from './common.ts';
 import type { OptionDefinition, OptionValues } from './options.ts';
 import { detectPackageManager } from './package-manager.ts';
 
@@ -37,15 +37,14 @@ export type Workspace = {
 		package: 'package.json';
 		gitignore: '.gitignore';
 
-		prettierignore: '.prettierignore';
-		prettierrc: '.prettierrc';
-		eslintConfig: 'eslint.config.js';
-
-		vscodeSettings: '.vscode/settings.json';
-		vscodeExtensions: '.vscode/extensions.json';
-
 		/** Get the relative path between two files */
 		getRelative: ({ from, to }: { from?: string; to: string }) => string;
+
+		/**
+		 * Find a file by walking up the directory tree from cwd.
+		 * Returns the relative path from cwd, or the filename itself if not found.
+		 */
+		findUp: (filename: string) => string;
 	};
 	isKit: boolean;
 	directory: {
@@ -103,7 +102,7 @@ export async function createWorkspace({
 			directory.length >= workspaceRoot.length
 		) {
 			if (fs.existsSync(path.join(directory, commonFilePaths.packageJson))) {
-				const { data: packageJson } = getPackageJson(directory);
+				const { data: packageJson } = loadPackageJson(directory);
 				dependencies = {
 					...packageJson.devDependencies,
 					...packageJson.dependencies,
@@ -142,11 +141,6 @@ export async function createWorkspace({
 			stylesheet,
 			package: 'package.json',
 			gitignore: '.gitignore',
-			prettierignore: '.prettierignore',
-			prettierrc: '.prettierrc',
-			eslintConfig: 'eslint.config.js',
-			vscodeSettings: '.vscode/settings.json',
-			vscodeExtensions: '.vscode/extensions.json',
 			getRelative({ from, to }) {
 				from = from ?? '';
 				let relativePath = path.posix.relative(path.posix.dirname(from), to);
@@ -155,6 +149,15 @@ export async function createWorkspace({
 					relativePath = `./${relativePath}`;
 				}
 				return relativePath;
+			},
+			findUp(filename) {
+				const found = find.up(filename, { cwd: resolvedCwd });
+				if (!found) return filename;
+				// don't escape .test-output during tests
+				if (resolvedCwd.includes('.test-output') && !found.includes('.test-output')) {
+					return filename;
+				}
+				return path.relative(resolvedCwd, found);
 			}
 		},
 		isKit,
@@ -173,7 +176,7 @@ function findWorkspaceRoot(cwd: string): string {
 				return directory;
 			}
 			// in other package managers it's a workspaces key in the package.json
-			const { data } = getPackageJson(directory);
+			const { data } = loadPackageJson(directory);
 			if (data.workspaces) {
 				return directory;
 			}
@@ -189,7 +192,7 @@ function findWorkspaceRoot(cwd: string): string {
 }
 
 function parseKitOptions(cwd: string, svelteConfigPath: string) {
-	const configSource = readFile(cwd, svelteConfigPath);
+	const configSource = loadFile(cwd, svelteConfigPath);
 	const { ast } = parse.script(configSource);
 
 	const defaultExport = ast.body.find((s) => s.type === 'ExportDefaultDeclaration');
